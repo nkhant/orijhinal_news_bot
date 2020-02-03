@@ -1,24 +1,19 @@
 ﻿const puppeteer = require('puppeteer');
 const rp = require('request-promise');
 const $ = require('cheerio');
-const url = 'https://gamepress.gg/arknights/operator/silverash';
+//const url = 'https://gamepress.gg/arknights/operator/silverash';
 
-
-//const operatorParse = function (url) {
-puppeteer
-    .launch()
-    .then(function (browser) {
-        return browser.newPage();
-    })
-    .then(function (page) {
-        return page.goto(url).then(function () {
-            console.log("Entering: " + url);
-
-            return page.content();
-        });
-    })
-    .then(function (html) {
-        console.log("beginning to retrieve");
+const operatorParse = function (url) {
+    (async () => {
+        /* Initiate the Puppeteer browser */
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+        /* Go to the IMDB Movie page and wait for it to load */
+        await page.goto(url);
+        const html = await page.content();
+        //var name = $('#page-title > h1', html).text();
+        //console.log(name);
+        /* Run javascript inside of the page */
         var rarity = 0;
         var tags = [];
         for (let i = 0; i < $('.rarity-cell > img', html).length; i++) {
@@ -27,7 +22,6 @@ puppeteer
         $('.tag-title', html).each(function () {
             tags.push($(this).text().trim());
         });
-
         var name = $('#page-title > h1', html).text();
         var profession = $('.profession-title', html).text().trim();
         var rangeType = $('.position-cell > .information-cell > .text-content-cell', html).text().trim();
@@ -59,8 +53,8 @@ puppeteer
         var buildingTwoBuffName = $('.building-buff-cell', html).last().find('.top-cell > .left-cell > .buff-title > .title-cell').text().trim();
         var buildingTwoBuffDescription = $('.building-buff-cell', html).last().find('.bottom-cell > .build-description-cell').text().trim();
         console.log("closing browser");
-
         console.log(name);
+        await browser.close();
         return {
             name: name,
             rarity: rarity,
@@ -95,13 +89,113 @@ puppeteer
             buildingTwoBuffName: buildingTwoBuffName,
             buildingTwoBuffDescription: buildingTwoBuffDescription,
         };
+        /* Outputting what we scraped */
+        //console.log(data);
+       
+    })();
+}
+//const operatorParse = function (url) {
+//puppeteer
+//    .launch({ headless: false })
+//    .then(function (browser) {
+//        return browser.newPage();
+//    })
+//    .then(function (page) {
+//        return page.goto(url).then(function () {
+//            console.log("Entering: " + url);
+//            return page.content();
+//        });
+//    })
+//    .then(function (html) {
+//        console.log("beginning to retrieve");
+//        var rarity = 0;
+//        var tags = [];
+//        for (let i = 0; i < $('.rarity-cell > img', html).length; i++) {
+//            rarity++;
+//        }
+//        $('.tag-title', html).each(function () {
+//            tags.push($(this).text().trim());
+//        });
 
-        console.log('returned');
-        browser.close();
-    })
-    .catch(function (err) {
-        //handle error
-    });
+//        var name = $('#page-title > h1', html).text();
+//        var profession = $('.profession-title', html).text().trim();
+//        var rangeType = $('.position-cell > .information-cell > .text-content-cell', html).text().trim();
+//        var damageType = $('.traits-cell > .information-cell > .text-content-cell', html).text().trim();
+//        var trait = $('.description-box', html).first().text().trim();
+//        var talentOneName = $('.talent-cell', html).first().find('.talent-child > .talent-title-cell > a').last().text().trim();
+//        var talentOneDescription = $('.talent-cell', html).first().find('.talent-child > .talent-description').last().text().trim();
+//        var talentTwoName = $('.talent-cell', html).last().find('.talent-child > .talent-title-cell > a').last().text().trim();
+//        var talentTwoDescription = $('.talent-cell', html).last().find('.talent-child > .talent-description').last().text().trim();
+//        var hp = $('#stat-hp', html).text().trim();
+//        var atk = $('#stat-atk', html).text().trim();
+//        var def = $('#stat-def', html).text().trim();
+//        var skillOneName = $('#skill-tab-1 > div > div > a', html).clone().children().remove().end().text().trim();
+//        var skillOneSPCost = $('#skill-tab-1 > .sp-cell > .sp-cost > .skill-upgrade-tab-10', html).text().trim();
+//        var skillOneInitialCost = $('#skill-tab-1 > .sp-cell > .initial-sp > .skill-upgrade-tab-10', html).text().trim();
+//        var skillOneSPChargeType = $('#skill-tab-1 > .skill-effect-parent > .sp-charge-type > .effect-description', html).text().trim();
+//        var skillOneActiviation = $('#skill-tab-1 >  .skill-effect-parent > .skill-activation > .effect-description > a', html).text().trim();
+//        var skillOneDuration = $('#skill-tab-1 >  .skill-effect-parent > .skill-duration > .skill-upgrade-tab-10', html).text().trim();
+//        var skillOneEffect = $('#skill-tab-1 >  .skill-description > .skill-upgrade-tab-10', html).text().trim();
+//        var skillTwoName = $('#skill-tab-2 > div > div > a', html).clone().children().remove().end().text().trim();
+//        var skillTwoSPCost = $('#skill-tab-2 > .sp-cell > .sp-cost > .skill-upgrade-tab-10', html).text().trim();
+//        var skillTwoInitialCost = $('#skill-tab-2 > .sp-cell > .initial-sp > .skill-upgrade-tab-10', html).text().trim();
+//        var skillTwoSPChargeType = $('#skill-tab-2 > .skill-effect-parent > .sp-charge-type > .effect-description', html).text().trim();
+//        var skillTwoActiviation = $('#skill-tab-2 >  .skill-effect-parent > .skill-activation > .effect-description > a', html).text().trim();
+//        var skillTwoDuration = $('#skill-tab-2 >  .skill-effect-parent > .skill-duration > .skill-upgrade-tab-10', html).text().trim();
+//        var skillTwoEffect = $('#skill-tab-2 >  .skill-description > .skill-upgrade-tab-10', html).text().trim();
+//        var buildingOneBuffName = $('.building-buff-cell', html).first().find('.top-cell > .left-cell > .buff-title > .title-cell').text().trim();
+//        var buildingOneBuffDescription = $('.building-buff-cell', html).first().find('.bottom-cell > .build-description-cell').text().trim();
+//        var buildingTwoBuffName = $('.building-buff-cell', html).last().find('.top-cell > .left-cell > .buff-title > .title-cell').text().trim();
+//        var buildingTwoBuffDescription = $('.building-buff-cell', html).last().find('.bottom-cell > .build-description-cell').text().trim();
+//        console.log("closing browser");
+//        console.log(name);
+//        //return {
+//        //    name: name,
+//        //    rarity: rarity,
+//        //    profession: profession,
+//        //    rangeType: rangeType,
+//        //    damageType: damageType,
+//        //    tag: tags,
+//        //    trait: trait,
+//        //    talentOneName: talentOneName,
+//        //    talentOneDescription: talentOneDescription,
+//        //    talentTwoName: talentTwoName,
+//        //    talentTwoDescription: talentTwoDescription,
+//        //    hp: hp,
+//        //    atk: atk,
+//        //    def: def,
+//        //    skillOneName: skillOneName,
+//        //    skillOneSPCost: skillOneSPCost,
+//        //    skillOneInitialCost: skillOneInitialCost,
+//        //    skillOneSPChargeType: skillOneSPChargeType,
+//        //    skillOneActiviation: skillOneActiviation,
+//        //    skillOneDuration: skillOneDuration,
+//        //    skillOneEffect: skillOneEffect,
+//        //    skillTwoName: skillTwoName,
+//        //    skillTwoSPCost: skillTwoSPCost,
+//        //    skillTwoInitialCost: skillTwoInitialCost,
+//        //    skillTwoSPChargeType: skillTwoSPChargeType,
+//        //    skillTwoActiviation: skillTwoActiviation,
+//        //    skillTwoDuration: skillTwoDuration,
+//        //    skillTwoEffect: skillTwoEffect,
+//        //    buildingOneBuffName: buildingOneBuffName,
+//        //    buildingOneBuffDescription: buildingOneBuffDescription,
+//        //    buildingTwoBuffName: buildingTwoBuffName,
+//        //    buildingTwoBuffDescription: buildingTwoBuffDescription,
+//        //};
+
+//        console.log('returned');
+//        //browser.close();
+//        //page.close();
+//        // return browser.close();
+//        page.close()
+//    })
+//    .then(function (browser) {
+//        return browser.close();
+//    })
+//    .catch(function (err) {
+//        //handle error
+//    });
 
 
 
@@ -257,7 +351,7 @@ puppeteer
 //        });
 //};
 
-//module.exports = operatorParse;
+module.exports = operatorParse;
 //rp(url)
 //    .then(function (html) {
 //        console.log($('#page-title > h1', html).text());
