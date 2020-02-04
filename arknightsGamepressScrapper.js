@@ -25,8 +25,8 @@ rp(url)
         //});
         //console.log(opLink);
         const operatorUrls = [];
-        for (let i = 0; i < 1; i++) {
-            //console.log($('.operator-icon > a', html)[i].attribs.href);
+        for (let i = 0; i < 2; i++) {
+            console.log($('.operator-icon > a', html)[i].attribs.href);
             operatorUrls.push($('.operator-icon > a', html)[i].attribs.href)
         }
         return Promise.all(
