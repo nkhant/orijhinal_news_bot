@@ -1,7 +1,11 @@
 ﻿const puppeteer = require('puppeteer');
 const rp = require('request-promise');
 const $ = require('cheerio');
-const url = 'https://gamepress.gg/arknights/operator/silverash';
+
+//const url = 'https://gamepress.gg/arknights/operator/silverash';
+
+
+//Async Version-----------------------------------------------------------------------------
 
 //const operatorparse = function (url) {
 //    (async () => {
@@ -95,25 +99,15 @@ const url = 'https://gamepress.gg/arknights/operator/silverash';
 //    })();
 //}
 
-
+//Working non Async Version -----------------------------------------------------------------------
 const operatorParse = function (url) {
-    //puppeteer.launch().then(browser => {
-    //    browser.newPage()
-    //        .then(page => page.goto(url))
-    //        .then(html => page.content({
-
-
-
-    //        }))
-    //        .then(buffer => browser.close());
-    //});
     return puppeteer
         .launch().then(function (browser) {
             return browser.newPage().then(function (page) {
                     return page.goto(url).then(function () {
-                        console.log("Entering: " + url);
+                        //console.log("Entering: " + url);
                         return page.content().then(function (html) {
-                            console.log("beginning to retrieve");
+                            //console.log("beginning to retrieve");
                             var rarity = 0;
                             var tags = [];
                             for (let i = 0; i < $('.rarity-cell > img', html).length; i++) {
@@ -122,41 +116,71 @@ const operatorParse = function (url) {
                             $('.tag-title', html).each(function () {
                                 tags.push($(this).text().trim());
                             });
-
+                            var name = $('#page-title > h1', html).text();
+                            var profession = $('.profession-title', html).text().trim();
+                            var rangeType = $('.position-cell > .information-cell > .text-content-cell', html).text().trim();
+                            var damageType = $('.traits-cell > .information-cell > .text-content-cell', html).text().trim();
+                            var trait = $('.description-box', html).first().text().trim();
+                            var talentOneName = $('.talent-cell', html).first().find('.talent-child > .talent-title-cell > a').last().text().trim();
+                            var talentOneDescription = $('.talent-cell', html).first().find('.talent-child > .talent-description').last().text().trim();
+                            var talentTwoName =  $('.talent-cell', html).last().find('.talent-child > .talent-title-cell > a').last().text().trim();
+                            var talentTwoDescription =  $('.talent-cell', html).last().find('.talent-child > .talent-description').last().text().trim();
+                            var hp =  $('#stat-hp', html).text().trim();
+                            var atk =  $('#stat-atk', html).text().trim();
+                            var def =  $('#stat-def', html).text().trim();
+                            var skillOneName =  $('#skill-tab-1 > div > div > a', html).clone().children().remove().end().text().trim();
+                            var skillOneSPCost =  $('#skill-tab-1 > .sp-cell > .sp-cost > .skill-upgrade-tab-10', html).text().trim();
+                            var skillOneInitialCost = $('#skill-tab-1 > .sp-cell > .initial-sp > .skill-upgrade-tab-10', html).text().trim();
+                            var skillOneSPChargeType = $('#skill-tab-1 > .skill-effect-parent > .sp-charge-type > .effect-description', html).text().trim();
+                            var skillOneActiviation = $('#skill-tab-1 >  .skill-effect-parent > .skill-activation > .effect-description > a', html).text().trim();
+                            var skillOneDuration = $('#skill-tab-1 >  .skill-effect-parent > .skill-duration > .skill-upgrade-tab-10', html).text().trim();
+                            var skillOneEffect = $('#skill-tab-1 >  .skill-description > .skill-upgrade-tab-10', html).text().trim();
+                            var skillTwoName = $('#skill-tab-2 > div > div > a', html).clone().children().remove().end().text().trim();
+                            var skillTwoSPCost = $('#skill-tab-2 > .sp-cell > .sp-cost > .skill-upgrade-tab-10', html).text().trim();
+                            var skillTwoInitialCost = $('#skill-tab-2 > .sp-cell > .initial-sp > .skill-upgrade-tab-10', html).text().trim();
+                            var skillTwoSPChargeType = $('#skill-tab-2 > .skill-effect-parent > .sp-charge-type > .effect-description', html).text().trim();
+                            var skillTwoActiviation = $('#skill-tab-2 >  .skill-effect-parent > .skill-activation > .effect-description > a', html).text().trim();
+                            var skillTwoDuration = $('#skill-tab-2 >  .skill-effect-parent > .skill-duration > .skill-upgrade-tab-10', html).text().trim();
+                            var skillTwoEffect = $('#skill-tab-2 >  .skill-description > .skill-upgrade-tab-10', html).text().trim();
+                            var buildingOneBuffName = $('.building-buff-cell', html).first().find('.top-cell > .left-cell > .buff-title > .title-cell').text().trim();
+                            var buildingOneBuffDescription = $('.building-buff-cell', html).first().find('.bottom-cell > .build-description-cell').text().trim();
+                            var buildingTwoBuffName = $('.building-buff-cell', html).last().find('.top-cell > .left-cell > .buff-title > .title-cell').text().trim();
+                            var buildingTwoBuffDescription = $('.building-buff-cell', html).last().find('.bottom-cell > .build-description-cell').text().trim();
+                            //page.close();
+                            browser.close();
                             return {
-                                name: $('#page-title > h1', html).text(),
+                                name: name,
                                 rarity: rarity,
-                                profession: $('.profession-title', html).text().trim(),
-                                rangeType: $('.position-cell > .information-cell > .text-content-cell', html).text().trim(),
-                                damageType: $('.traits-cell > .information-cell > .text-content-cell', html).text().trim(),
+                                profession: profession,
+                                rangeType: rangeType,
+                                damageType: damageType,
                                 tag: tags,
-                                trait: $('.description-box', html).first().text().trim(),
-                                talentOneName: $('.talent-cell', html).first().find('.talent-child > .talent-title-cell > a').last().text().trim(),
-                                talentOneDescription: $('.talent-cell', html).first().find('.talent-child > .talent-description').last().text().trim(),
-                                talentTwoName: $('.talent-cell', html).last().find('.talent-child > .talent-title-cell > a').last().text().trim(),
-                                talentTwoDescription: $('.talent-cell', html).last().find('.talent-child > .talent-description').last().text().trim(),
-                                hp: $('#stat-hp', html).text().trim(),
-                                atk: $('#stat-atk', html).text().trim(),
-                                def: $('#stat-def', html).text().trim(),
-                                skillOneName: $('#skill-tab-1 > div > div > a', html).clone().children().remove().end().text().trim(),
-                                skillOneSPCost: $('#skill-tab-1 > .sp-cell > .sp-cost > .skill-upgrade-tab-10', html).text().trim(),
-                                skillOneInitialCost: $('#skill-tab-1 > .sp-cell > .initial-sp > .skill-upgrade-tab-10', html).text().trim(),
-                                skillOneSPChargeType: $('#skill-tab-1 > .skill-effect-parent > .sp-charge-type > .effect-description', html).text().trim(),
-                                skillOneActiviation: $('#skill-tab-1 >  .skill-effect-parent > .skill-activation > .effect-description > a', html).text().trim(),
-                                skillOneDuration: $('#skill-tab-1 >  .skill-effect-parent > .skill-duration > .skill-upgrade-tab-10', html).text().trim(),
-                                skillOneEffect: $('#skill-tab-1 >  .skill-description > .skill-upgrade-tab-10', html).text().trim(),
-                                skillTwoName: $('#skill-tab-2 > div > div > a', html).clone().children().remove().end().text().trim(),
-                                skillTwoSPCost: $('#skill-tab-2 > .sp-cell > .sp-cost > .skill-upgrade-tab-10', html).text().trim(),
-                                skillTwoInitialCost: $('#skill-tab-2 > .sp-cell > .initial-sp > .skill-upgrade-tab-10', html).text().trim(),
-                                skillTwoSPChargeType: $('#skill-tab-2 > .skill-effect-parent > .sp-charge-type > .effect-description', html).text().trim(),
-                                skillTwoActiviation: $('#skill-tab-2 >  .skill-effect-parent > .skill-activation > .effect-description > a', html).text().trim(),
-                                skillTwoDuration: $('#skill-tab-2 >  .skill-effect-parent > .skill-duration > .skill-upgrade-tab-10', html).text().trim(),
-                                skillTwoEffect: $('#skill-tab-2 >  .skill-description > .skill-upgrade-tab-10', html).text().trim(),
-                                buildingOneBuffName: $('.building-buff-cell', html).first().find('.top-cell > .left-cell > .buff-title > .title-cell').text().trim(),
-                                buildingOneBuffDescription: $('.building-buff-cell', html).first().find('.bottom-cell > .build-description-cell').text().trim(),
-                                buildingTwoBuffName: $('.building-buff-cell', html).last().find('.top-cell > .left-cell > .buff-title > .title-cell').text().trim(),
-                                buildingTwoBuffDescription: $('.building-buff-cell', html).last().find('.bottom-cell > .build-description-cell').text().trim(),
-
+                                trait: trait,
+                                talentOneName: talentOneName,
+                                talentOneDescription: talentOneDescription,
+                                talentTwoName: talentTwoName,
+                                talentTwoDescription: talentTwoDescription,
+                                hp: hp,
+                                atk: atk,
+                                def: def,
+                                skillOneName: skillOneName,
+                                skillOneSPCost: skillOneSPCost,
+                                skillOneInitialCost: skillOneInitialCost,
+                                skillOneSPChargeType: skillOneSPChargeType,
+                                skillOneActiviation: skillOneActiviation,
+                                skillOneDuration: skillOneDuration,
+                                skillOneEffect: skillOneEffect,
+                                skillTwoName: skillTwoName,
+                                skillTwoSPCost: skillTwoSPCost,
+                                skillTwoInitialCost: skillTwoInitialCost,
+                                skillTwoSPChargeType: skillTwoSPChargeType,
+                                skillTwoActiviation: skillTwoActiviation,
+                                skillTwoDuration: skillTwoDuration,
+                                skillTwoEffect: skillTwoEffect,
+                                buildingOneBuffName: buildingOneBuffName,
+                                buildingOneBuffDescription: buildingOneBuffDescription,
+                                buildingTwoBuffName: buildingTwoBuffName,
+                                buildingTwoBuffDescription: buildingTwoBuffDescription,
                             };
                         })
                     })
@@ -168,6 +192,8 @@ const operatorParse = function (url) {
 }
 
 //console.log(operatorParse(url));
+
+//Outdated version async-------------------------------------
 //const operatorParse = function (url) {
 //puppeteer
 //    .launch({ headless: false })
@@ -373,6 +399,7 @@ const operatorParse = function (url) {
 //        });
    
 
+//working rp version-------------------------------------------------------------------------------
 //const operatorParse = function (url) {
 //    return rp(url)
 //        .then(function (html) {
@@ -426,6 +453,8 @@ const operatorParse = function (url) {
 //};
 
 module.exports = operatorParse;
+
+//test version (not dependant on a file)----------------------------------------------------
 //rp(url)
 //    .then(function (html) {
 //        console.log($('#page-title > h1', html).text());
